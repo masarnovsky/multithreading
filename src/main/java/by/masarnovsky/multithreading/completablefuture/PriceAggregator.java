@@ -23,9 +23,9 @@ public class PriceAggregator {
                         .exceptionally((ex) -> Double.MAX_VALUE))
                 .toArray(CompletableFuture[]::new);
 
-        CompletableFuture<Object> any = CompletableFuture.anyOf(tasks);
+        CompletableFuture<Void> all = CompletableFuture.allOf(tasks);
 
-        OptionalDouble min = any
+        OptionalDouble min = all
                 .thenApply(
                         v -> Arrays.stream(tasks).mapToDouble(CompletableFuture::join).min())
                 .join();
