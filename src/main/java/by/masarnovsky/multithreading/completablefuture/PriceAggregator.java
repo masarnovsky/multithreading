@@ -19,8 +19,7 @@ public class PriceAggregator {
                 .stream()
                 .map(id -> CompletableFuture
                         .supplyAsync(() -> priceRetriever.getPrice(itemId, id))
-                        .orTimeout(2900, TimeUnit.MILLISECONDS)
-                        .exceptionally((ex) -> Double.MAX_VALUE))
+                        .completeOnTimeout(Double.MAX_VALUE, 2900, TimeUnit.MILLISECONDS))
                 .toArray(CompletableFuture[]::new);
 
         CompletableFuture<Void> all = CompletableFuture.allOf(tasks);
