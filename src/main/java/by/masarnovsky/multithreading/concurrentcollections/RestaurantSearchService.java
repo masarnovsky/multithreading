@@ -1,13 +1,14 @@
 package by.masarnovsky.multithreading.concurrentcollections;
 
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class RestaurantSearchService {
 
     private final ConcurrentHashMap<Restaurant, Integer> stat = new ConcurrentHashMap<>();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public Restaurant getByName(String restaurantName) {
         addToStat(restaurantName);
@@ -19,7 +20,14 @@ public class RestaurantSearchService {
         if (restaurant != null) {
             stat.computeIfPresent(restaurant, (r, i) -> i + 1);
         } else {
-            stat.putIfAbsent(new Restaurant(restaurantName), 1);
+            if (lock.tryLock()) {
+                lock.lock();
+                try {
+                    stat.putIfAbsent(new Restaurant(restaurantName), 1);
+                } finally {
+                    lock.unlock();
+                }
+            }
         }
     }
 
