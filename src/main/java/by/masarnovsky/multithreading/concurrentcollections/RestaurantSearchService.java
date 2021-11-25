@@ -15,13 +15,7 @@ public class RestaurantSearchService {
 
     public void addToStat(String restaurantName) {
         Restaurant restaurant = getRestaurantByName(restaurantName);
-        if (restaurant != null) {
-            stat.computeIfPresent(restaurant, (r, i) -> i + 1);
-        } else {
-            synchronized (stat) {
-                stat.putIfAbsent(new Restaurant(restaurantName), 1);
-            }
-        }
+        stat.compute(restaurant, (k, v) -> (v != null) ? v + 1 : 1);
     }
 
     public Set<String> printStat() {
