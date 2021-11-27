@@ -2,11 +2,13 @@ package by.masarnovsky.multithreading.concurrentcollections;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 public class RestaurantSearchService {
 
     private final ConcurrentHashMap<Restaurant, Integer> stat = new ConcurrentHashMap<>();
+    private final CopyOnWriteArraySet<Restaurant> restaurants = new CopyOnWriteArraySet<>();
 
     public Restaurant getByName(String restaurantName) {
         addToStat(restaurantName);
@@ -27,10 +29,10 @@ public class RestaurantSearchService {
     }
 
     private Restaurant getRestaurantByName(String name) {
-        return stat
-                .keySet()
+        return restaurants
                 .stream()
-                .filter(r -> r.getName().equals(name))
-                .findFirst().orElse(null);
+                .filter(restaurant -> restaurant.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }
