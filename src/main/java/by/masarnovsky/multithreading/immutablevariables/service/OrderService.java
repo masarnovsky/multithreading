@@ -5,41 +5,46 @@ import by.masarnovsky.multithreading.immutablevariables.model.Order;
 import by.masarnovsky.multithreading.immutablevariables.model.PaymentInfo;
 import by.masarnovsky.multithreading.immutablevariables.model.Status;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class OrderService {
 
-    private Map<Long, Order> currentOrders = new HashMap<>();
-    private long nextId = 0L;
+    private final ConcurrentHashMap<Long, Order> currentOrders = new ConcurrentHashMap<>();
 
-    private synchronized long nextId() {
-        return nextId++;
-    }
-
-    public synchronized long createOrder(List<Item> items) {
-        long id = nextId();
+    public long createOrder(List<Item> items) {
         Order order = new Order(items);
-        order.setId(id);
-        currentOrders.put(id, order);
-        return id;
+        Long orderId = order.getId();
+        currentOrders.put(orderId, order);
+        return orderId;
     }
 
-    public synchronized void updatePaymentInfo(long cartId, PaymentInfo paymentInfo) {
-        currentOrders.get(cartId).setPaymentInfo(paymentInfo);
-        if (currentOrders.get(cartId).checkStatus()) {
-            deliver(currentOrders.get(cartId));
-            currentOrders.get(cartId).setStatus(Status.DELIVERED);
+    public void updatePaymentInfo(long cartId, PaymentInfo paymentInfo) {
+        Order order = currentOrders.get(cartId);
+
+        synchronized (order) {
+            order.setPaymentInfo(paymentInfo);
+            if (order.checkStatus()) {
+                deliver(order);
+                order.setStatus(Status.DELIVERED);
+            }
         }
     }
 
-    public synchronized void setPacked(long cartId) {
-        currentOrders.get(cartId).setPacked(true);
-        if (currentOrders.get(cartId).checkStatus()) {
-            deliver(currentOrders.get(cartId));
+    public void setPacked(long cartId) {
+        Order order = currentOrders.get(cartId);
+
+        synchronized (order) {
+            order.setPacked(true);
+            if (order.checkStatus()) {
+                deliver(order);
+            }
         }
     }
 
-    private synchronized void deliver(Order order) { /*...*/ }
+    private void deliver(Order order) {
+        synchronized (order) {
+            // logic
+        }
+    }
 }

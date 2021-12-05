@@ -1,16 +1,20 @@
 package by.masarnovsky.multithreading.immutablevariables.model;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
-public class Order {
+public final class Order {
+    private final static AtomicLong nextId = new AtomicLong(0L);
 
-    private Long id;
-    private List<Item> items;
+    private final Long id;
+    private final List<Item> items;
     private PaymentInfo paymentInfo;
     private boolean isPacked;
     private Status status;
 
     public Order(List<Item> items) {
+        this.id = nextId.incrementAndGet();
         this.items = items;
     }
 
@@ -26,16 +30,8 @@ public class Order {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public List<Item> getItems() {
-        return items;
-    }
-
-    public void setItems(List<Item> items) {
-        this.items = items;
+        return Collections.unmodifiableList(items);
     }
 
     public PaymentInfo getPaymentInfo() {

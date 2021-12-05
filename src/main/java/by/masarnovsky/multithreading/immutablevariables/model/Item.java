@@ -1,4 +1,4 @@
 package by.masarnovsky.multithreading.immutablevariables.model;
 
-public class Item {
+public final class Item {
 }
