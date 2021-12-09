@@ -1,4 +1,4 @@
-package by.masarnovsky.multithreading;
+package by.masarnovsky.multithreading.blockingqueue;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
