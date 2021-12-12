@@ -18,6 +18,14 @@ public final class Order {
         this.items = items;
     }
 
+    private Order(Long id, List<Item> items, PaymentInfo paymentInfo, boolean isPacked, Status status) {
+        this.id = id;
+        this.items = items;
+        this.paymentInfo = paymentInfo;
+        this.isPacked = isPacked;
+        this.status = status;
+    }
+
     public synchronized boolean checkStatus() {
         if (items != null && !items.isEmpty() && paymentInfo != null && isPacked) {
             status = Status.DELIVERED;
@@ -38,23 +46,23 @@ public final class Order {
         return paymentInfo;
     }
 
-    public void setPaymentInfo(PaymentInfo paymentInfo) {
-        this.paymentInfo = paymentInfo;
+    public Order withPaymentInfo(PaymentInfo paymentInfo) {
+        return new Order(this.id, this.items, paymentInfo, this.isPacked, this.status);
     }
 
     public boolean isPacked() {
         return isPacked;
     }
 
-    public void setPacked(boolean packed) {
-        isPacked = packed;
+    public Order withPacked(boolean packed) {
+        return new Order(this.id, this.items, this.paymentInfo, packed, this.status);
     }
 
     public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public Order withStatus(Status status) {
+        return new Order(this.id, this.items, this.paymentInfo, this.isPacked, status);
     }
 }
