@@ -22,23 +22,26 @@ public class OrderService {
     public void updatePaymentInfo(long cartId, PaymentInfo paymentInfo) {
         Order order = currentOrders.get(cartId);
 
-        order = order.withPaymentInfo(paymentInfo);
-
-        if (order.checkStatus()) {
-            deliver(order);
-            order = order.withStatus(Status.DELIVERED);
+        synchronized (order) {
+            order = order.withPaymentInfo(paymentInfo);
+            if (order.checkStatus()) {
+                deliver(order);
+                order = order.withStatus(Status.DELIVERED);
+            }
+            currentOrders.replace(order.getId(), order);
         }
-        currentOrders.replace(order.getId(), order);
     }
 
     public void setPacked(long cartId) {
         Order order = currentOrders.get(cartId);
 
-        order = order.withPacked(true);
-        if (order.checkStatus()) {
-            deliver(order);
+        synchronized (order) {
+            order = order.withPacked(true);
+            if (order.checkStatus()) {
+                deliver(order);
+            }
+            currentOrders.replace(order.getId(), order);
         }
-        currentOrders.replace(order.getId(), order);
     }
 
     private void deliver(Order order) {
