@@ -1,5 +1,8 @@
 package by.masarnovsky.multithreading.blockingqueue;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -19,6 +22,15 @@ public class BlockingQueueExample {
         });
 
         // 6. Discard new tasks if we can't insert in queue
-        ThreadPoolExecutor tpe2 = new ThreadPoolExecutor(4, 8, 1L, TimeUnit.MINUTES, new LinkedBlockingDeque<>(), new ThreadPoolExecutor.DiscardPolicy());
+        ThreadPoolExecutor tpe2 = new ThreadPoolExecutor(4, 4, 1L, TimeUnit.MINUTES, new LinkedBlockingDeque<>(), new ThreadPoolExecutor.AbortPolicy()) {
+            @Override
+            public Future<?> submit(Runnable task) {
+                if (this.getMaximumPoolSize() > this.getActiveCount()) {
+                    return super.submit(task);
+                }
+                return null;
+            }
+        };
+
     }
 }
