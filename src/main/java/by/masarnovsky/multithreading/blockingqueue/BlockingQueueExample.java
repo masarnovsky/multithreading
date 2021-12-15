@@ -1,7 +1,5 @@
 package by.masarnovsky.multithreading.blockingqueue;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
