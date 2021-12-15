@@ -23,7 +23,7 @@ public class OrderService {
         Order order = currentOrders.get(cartId);
 
         order = order.withPaymentInfo(paymentInfo);
-        order = currentOrders.replace(order.getId(), order);
+        order = currentOrders.put(order.getId(), order);
         if (order.checkStatus()) {
             deliver(order);
             order = order.withStatus(Status.DELIVERED);
@@ -35,7 +35,7 @@ public class OrderService {
     public void setPacked(long cartId) {
         Order order = currentOrders.get(cartId);
         order = order.withPacked(true);
-        order = currentOrders.replace(order.getId(), order);
+        order = currentOrders.put(order.getId(), order);
 
         if (order.checkStatus()) {
             deliver(order);
@@ -43,8 +43,5 @@ public class OrderService {
     }
 
     private void deliver(Order order) {
-        synchronized (order) {
-            // logic
-        }
     }
 }
