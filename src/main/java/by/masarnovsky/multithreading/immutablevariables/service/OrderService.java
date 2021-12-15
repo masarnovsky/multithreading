@@ -27,9 +27,8 @@ public class OrderService {
         if (order.checkStatus()) {
             deliver(order);
             order = order.withStatus(Status.DELIVERED);
+            order = currentOrders.put(order.getId(), order);
         }
-
-        order = currentOrders.replace(order.getId(), order);
     }
 
     public void setPacked(long cartId) {
@@ -39,6 +38,7 @@ public class OrderService {
 
         if (order.checkStatus()) {
             deliver(order);
+            order = currentOrders.put(order.getId(), order);
         }
     }
 
