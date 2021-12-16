@@ -22,8 +22,7 @@ public class OrderService {
     public void updatePaymentInfo(long cartId, PaymentInfo paymentInfo) {
         Order order = currentOrders.get(cartId);
 
-        order = order.withPaymentInfo(paymentInfo);
-        order = currentOrders.put(order.getId(), order);
+        order = currentOrders.compute(order.getId(), (k, v) -> v.withPaymentInfo(paymentInfo));
         if (order.checkStatus()) {
             deliver(order);
             order = order.withStatus(Status.DELIVERED);
@@ -33,8 +32,7 @@ public class OrderService {
 
     public void setPacked(long cartId) {
         Order order = currentOrders.get(cartId);
-        order = order.withPacked(true);
-        order = currentOrders.put(order.getId(), order);
+        order = currentOrders.compute(order.getId(), (k, v) -> v.withPacked(true));
 
         if (order.checkStatus()) {
             deliver(order);
